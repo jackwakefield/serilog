@@ -185,36 +185,7 @@ namespace Serilog.Tests
         }
 
         [Theory]
-        [InlineData(Write)]
-        [InlineData(nameof(LogEventLevel.Verbose))]
-        [InlineData(nameof(LogEventLevel.Debug))]
-        [InlineData(nameof(LogEventLevel.Information))]
-        [InlineData(nameof(LogEventLevel.Warning))]
-        [InlineData(nameof(LogEventLevel.Error))]
-        [InlineData(nameof(LogEventLevel.Fatal))]
-        public void LogValidateConventions(string setName)
-        {
-            ValidateConventionForMethodSet(setName, typeof(Log));
-        }
-
-        [Theory]
-        [InlineData(Write)]
-        [InlineData(nameof(LogEventLevel.Verbose))]
-        [InlineData(nameof(LogEventLevel.Debug))]
-        [InlineData(nameof(LogEventLevel.Information))]
-        [InlineData(nameof(LogEventLevel.Warning))]
-        [InlineData(nameof(LogEventLevel.Error))]
-        [InlineData(nameof(LogEventLevel.Fatal))]
-        public void SilentLoggerValidateConventions(string setName)
-        {
-            ValidateConventionForMethodSet(setName, typeof(SilentLogger),
-                checkMesgTempAttr: false, testInvokeResults: false);
-        }
-
-        [Theory]
-        [InlineData(typeof(SilentLogger))]
         [InlineData(typeof(Logger))]
-        [InlineData(typeof(Log))]
         [InlineData(typeof(ILogger))]
         public void ValidateWriteEventLogMethods(Type loggerType)
         {
@@ -235,17 +206,11 @@ namespace Serilog.Tests
 
             InvokeMethod(writeMethod, logger, new object[] { Some.LogEvent(DateTimeOffset.Now, level) });
 
-            //handle silent logger special case i.e. no result validation
-            if (loggerType == typeof(SilentLogger))
-                return;
-
             EvaluateSingleResult(level, sink);
         }
 
         [Theory]
-        [InlineData(typeof(SilentLogger))]
         [InlineData(typeof(Logger))]
-        [InlineData(typeof(Log))]
         [InlineData(typeof(ILogger))]
         public void ValidateForContextMethods(Type loggerType)
         {
@@ -296,9 +261,7 @@ namespace Serilog.Tests
         }
 
         [Theory]
-        [InlineData(typeof(SilentLogger))]
         [InlineData(typeof(Logger))]
-        [InlineData(typeof(Log))]
         [InlineData(typeof(ILogger))]
         public void ValidateBindMessageTemplateMethods(Type loggerType)
         {
@@ -344,10 +307,6 @@ namespace Serilog.Tests
 
             Assert.IsType<bool>(result);
 
-            //SilentLogger is always false
-            if (loggerType == typeof(SilentLogger))
-                return;
-
             Assert.True(result as bool?);
 
             //test null arg path
@@ -358,9 +317,7 @@ namespace Serilog.Tests
         }
 
         [Theory]
-        [InlineData(typeof(SilentLogger))]
         [InlineData(typeof(Logger))]
-        [InlineData(typeof(Log))]
         [InlineData(typeof(ILogger))]
         public void ValidateBindPropertyMethods(Type loggerType)
         {
@@ -400,10 +357,6 @@ namespace Serilog.Tests
 
             Assert.IsType<bool>(result);
 
-            //SilentLogger will always be false
-            if (loggerType == typeof(SilentLogger))
-                return;
-
             Assert.True(result as bool?);
 
             //test null arg path/ invalid property name
@@ -414,9 +367,7 @@ namespace Serilog.Tests
         }
 
         [Theory]
-        [InlineData(typeof(SilentLogger))]
         [InlineData(typeof(Logger))]
-        [InlineData(typeof(Log))]
         [InlineData(typeof(ILogger))]
         public void ValidateIsEnabledMethods(Type loggerType)
         {
@@ -445,10 +396,6 @@ namespace Serilog.Tests
             var trueResult = InvokeMethod(method, logger, new object[] { LogEventLevel.Warning });
 
             Assert.IsType<bool>(trueResult);
-
-            //return as SilentLogger will always be false
-            if (loggerType == typeof(SilentLogger))
-                return;
 
             Assert.True(trueResult as bool?);
         }
@@ -555,10 +502,6 @@ namespace Serilog.Tests
             Assert.NotNull(enrichedLogger);
             Assert.True(enrichedLogger is ILogger);
 
-            //SilentLogger will always return itself
-            if (method.DeclaringType == typeof(SilentLogger))
-                return;
-
             Assert.NotSame(logger, enrichedLogger);
 
             //invalid args path
@@ -567,10 +510,7 @@ namespace Serilog.Tests
             Assert.NotNull(sameLogger);
             Assert.True(sameLogger is ILogger);
 
-            if (method.DeclaringType == typeof(Log))
-                Assert.Same(Log.Logger, sameLogger);
-            else
-                Assert.Same(logger, sameLogger);
+            Assert.Same(logger, sameLogger);
         }
 
         //public ILogger ForContext<TSource>()
@@ -637,9 +577,6 @@ namespace Serilog.Tests
             Assert.NotNull(normalResult);
             Assert.True(normalResult is ILogger);
 
-            if (method.DeclaringType == typeof(SilentLogger))
-                return;
-
             Assert.NotSame(logger, normalResult);
 
             //if invoked with null args it should return the same instance
@@ -647,10 +584,7 @@ namespace Serilog.Tests
 
             Assert.NotNull(sameLogger);
 
-            if (method.DeclaringType == typeof(Log))
-                Assert.Same(Log.Logger, sameLogger);
-            else
-                Assert.Same(logger, sameLogger);
+            Assert.Same(logger, sameLogger);
         }
 
         void ValidateConventionForMethodSet(
@@ -1040,23 +974,6 @@ namespace Serilog.Tests
                     .WriteTo.Sink(sink)
                     .CreateLogger();
             }
-
-            if (loggerType == typeof(Log))
-            {
-                sink = new CollectingSink();
-
-                Log.CloseAndFlush();
-
-                Log.Logger = new LoggerConfiguration()
-                    .MinimumLevel.Is(level)
-                    .WriteTo.Sink(sink)
-                    .CreateLogger();
-
-                return null;
-            }
-
-            if (loggerType == typeof(SilentLogger))
-                return SilentLogger.Instance;
 
             throw new ArgumentException($"Logger Type of {loggerType} is not supported");
         }

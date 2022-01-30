@@ -32,7 +32,7 @@ namespace Serilog
     /// log.Information("Hello, {Thing}!", thing);
     /// </example>
     /// <remarks>
-    /// The methods on <see cref="ILogger"/> (and its static sibling <see cref="Log"/>) are guaranteed
+    /// The methods on <see cref="ILogger"/> are guaranteed
     /// never to throw exceptions. Methods on all other types may.
     /// </remarks>
     public interface ILogger

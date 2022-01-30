@@ -1,4 +1,4 @@
-﻿using Serilog.Configuration;
+using Serilog.Configuration;
 using Serilog.Settings.KeyValuePairs;
 using System.Linq;
 using System.Reflection;
@@ -9,7 +9,7 @@ namespace Serilog.Tests.Settings
 {
     public class CallableConfigurationMethodFinderTests
     {
-        static readonly Assembly SerilogAssembly = typeof(Log).GetTypeInfo().Assembly;
+        static readonly Assembly SerilogAssembly = typeof(ILogger).GetTypeInfo().Assembly;
         static readonly Assembly TestDummiesAssembly = typeof(DummyLoggerConfigurationExtensions).GetTypeInfo().Assembly;
 
         [Fact]

@@ -1,4 +1,4 @@
-﻿// Copyright 2013-2016 Serilog Contributors
+// Copyright 2013-2016 Serilog Contributors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -1372,10 +1372,5 @@ namespace Serilog.Core
         {
             _dispose?.Invoke();
         }
-
-        /// <summary>
-        /// An <see cref="ILogger"/> instance that efficiently ignores all method calls.
-        /// </summary>
-        public static ILogger None { get; } = SilentLogger.Instance;
     }
 }

@@ -131,30 +131,6 @@ namespace Serilog.Tests.Core
             Assert.Equal("World", property.Value.LiteralValue());
         }
 
-        [Fact]
-        public void TheNoneLoggerIsSilent()
-        {
-            Assert.IsType<SilentLogger>(Logger.None);
-        }
-
-        [Fact]
-        public void TheNoneLoggerIsAConstant()
-        {
-            var firstCall = Logger.None;
-            var secondCall = Logger.None;
-            Assert.Equal(firstCall, secondCall);
-        }
-
-        [Fact]
-        public void TheNoneLoggerIsSingleton()
-        {
-            lock (new object())
-            {
-                Log.CloseAndFlush();
-                Assert.Same(Log.Logger, Logger.None);
-            }
-        }
-
         static ILogger CreateLogger(Type loggerType, Func<LoggerConfiguration, LoggerConfiguration> configureLogger)
         {
             var lc = new LoggerConfiguration();
